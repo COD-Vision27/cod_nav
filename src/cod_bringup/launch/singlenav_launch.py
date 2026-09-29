@@ -18,7 +18,7 @@ def generate_launch_description():
     fast_lio_config_file = 'mid360.yaml'
     # 声明启动参数
     declare_use_sim_time = DeclareLaunchArgument(
-        'use_sim_time', default_value='false',
+        'use_sim_time', default_value='true',
         description='Use simulation (Gazebo) clock if true')
     declare_slam_params_file = DeclareLaunchArgument(
         'slam_params_file', default_value=os.path.join(bring_up_dir,'params','mapper_params_async.yaml')
@@ -48,72 +48,72 @@ def generate_launch_description():
                     'leaf_size': 0.05   # 降采样
                 }]
             ),
-            Node(
-                    package="small_point_lio",
-                    executable="small_point_lio_node",
-                    name="small_point_lio",
-                    output="screen",
-                    parameters=[
-                        PathJoinSubstitution(
-                            [
-                                FindPackageShare("small_point_lio"),
-                                "config",
-                                "mid360.yaml",
-                            ]
-                        )
-                    ],
-            ),
-            Node(
-                    package="small_gicp_relocalization",
-                    executable="small_gicp_relocalization_node",
-                    namespace="",
-                    output="screen",
-                    parameters=[
-                        {
-                               "num_threads": 4,
-                               "num_neighbors": 10,
-                               "global_leaf_size": 0.25,
-                               "registered_leaf_size": 0.25,
-                               "max_dist_sq": 1.0,
-                               "map_frame": "map",
-                               "odom_frame": "odom",
-                               "base_frame": "",
-                               "lidar_frame": "",
-                               "prior_pcd_file": "",
-                               "input_cloud_topic": "cloud_registered",
-                        }
-                    ],
-            ),
-
             # Node(
-            #     package="tf2_ros",
-            #     executable="static_transform_publisher",
-            #     name="map_to_odom",
-            #     arguments=[
-            #         "--x",
-            #         "0.0",
-            #         "--y",
-            #         "0.0",
-            #         "--z",
-            #         "0.05",
-            #         "--roll",
-            #         "0.0",
-            #         "--pitch",
-            #         "0.0",
-            #         "--yaw",
-            #         "-0.5",
-            #         "--frame-id",
-            #         "map",
-            #         "--child-frame-id",
-            #         "odom",
-            #     ],
+            #         package="small_point_lio",
+            #         executable="small_point_lio_node",
+            #         name="small_point_lio",
+            #         output="screen",
+            #         parameters=[
+            #             PathJoinSubstitution(
+            #                 [
+            #                     FindPackageShare("small_point_lio"),
+            #                     "config",
+            #                     "mid360.yaml",
+            #                 ]
+            #             )
+            #         ],
             # ),
+            # Node(
+            #         package="small_gicp_relocalization",
+            #         executable="small_gicp_relocalization_node",
+            #         namespace="",
+            #         output="screen",
+            #         parameters=[
+            #             {
+            #                    "num_threads": 4,
+            #                    "num_neighbors": 10,
+            #                    "global_leaf_size": 0.25,
+            #                    "registered_leaf_size": 0.25,
+            #                    "max_dist_sq": 1.0,
+            #                    "map_frame": "map",
+            #                    "odom_frame": "odom",
+            #                    "base_frame": "",
+            #                    "lidar_frame": "",
+            #                    "prior_pcd_file": "",
+            #                    "input_cloud_topic": "cloud_registered",
+            #             }
+            #         ],
+            # ),
+
             Node(
-                package="fake_vel_transform",
-                executable="fake_vel_transform_node",
-                output="screen",
-                parameters=[{"use_sim_time": use_sim_time}],
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                name="map_to_odom",
+                arguments=[
+                    "--x",
+                    "0.0",
+                    "--y",
+                    "0.0",
+                    "--z",
+                    "0.05",
+                    "--roll",
+                    "0.0",
+                    "--pitch",
+                    "0.0",
+                    "--yaw",
+                    "-0.5",
+                    "--frame-id",
+                    "map",
+                    "--child-frame-id",
+                    "odom",
+                ],
             ),
+            # Node(
+            #     package="fake_vel_transform",
+            #     executable="fake_vel_transform_node",
+            #     output="screen",
+            #     parameters=[{"use_sim_time": use_sim_time}],
+            # ),
             Node(
                 package="cod_serial_ul26",
                 executable="cod_serial",

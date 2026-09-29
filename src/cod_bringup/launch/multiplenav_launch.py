@@ -17,7 +17,7 @@ def generate_launch_description():
 
     # 声明启动参数
     declare_use_sim_time = DeclareLaunchArgument(
-        'use_sim_time', default_value='false',
+        'use_sim_time', default_value='true',
         description='Use simulation (Gazebo) clock if true')
     declare_slam_params_file = DeclareLaunchArgument(
         'slam_params_file', default_value=os.path.join(bring_up_dir,'params','mapper_params_online_async.yaml')
@@ -38,7 +38,7 @@ def generate_launch_description():
                 name='my_lidar_filter',
                 output='screen',
                 parameters=[{
-                    'input_topic': '/livox/lidar',
+                    'input_topic': '/livox/lidar_raw',
                     'output_topic': '/livox/lidar_filtered',
                     'min_x': -0.2, 'max_x': 0.2,
                     'min_y': -0.2, 'max_y': 0.4,
@@ -47,49 +47,48 @@ def generate_launch_description():
                     'leaf_size': 0.05   # 降采样
                 }]
             ),
-            Node(
-                    package="small_point_lio",
-                    executable="small_point_lio_node",
-                    name="small_point_lio",
-                    output="screen",
-                    parameters=[
-                        PathJoinSubstitution(
-                            [
-                                FindPackageShare("small_point_lio"),
-                                "config",
-                                "mid360.yaml",
-                            ]
-                        )
-                    ],
-            ),
-            Node(
-                    package="small_gicp_relocalization",
-                    executable="small_gicp_relocalization_node",
-                    namespace="",
-                    output="screen",
-                    remappings=remappings,
-                    parameters=[
-                        {
-                               "num_threads": 4,
-                               "num_neighbors": 10,
-                               "global_leaf_size": 0.25,
-                               "registered_leaf_size": 0.25,
-                               "max_dist_sq": 1.0,
-                               "map_frame": "map",
-                               "odom_frame": "odom",
-                               "base_frame": "",
-                               "lidar_frame": "",
-                               "prior_pcd_file": "",
-                               "input_cloud_topic": "cloud_registered",
-                        }
-                    ],
-            ),
+            # Node(
+            #         package="small_point_lio",
+            #         executable="small_point_lio_node",
+            #         name="small_point_lio",
+            #         output="screen",
+            #         parameters=[
+            #             PathJoinSubstitution(
+            #                 [
+            #                     FindPackageShare("small_point_lio"),
+            #                     "config",
+            #                     "mid360.yaml",
+            #                 ]
+            #             )
+            #         ],
+            # ),
+            # Node(
+            #         package="small_gicp_relocalization",
+            #         executable="small_gicp_relocalization_node",
+            #         namespace="",
+            #         output="screen",
+            #         parameters=[
+            #             {
+            #                    "num_threads": 4,
+            #                    "num_neighbors": 10,
+            #                    "global_leaf_size": 0.25,
+            #                    "registered_leaf_size": 0.25,
+            #                    "max_dist_sq": 1.0,
+            #                    "map_frame": "map",
+            #                    "odom_frame": "odom",
+            #                    "base_frame": "",
+            #                    "lidar_frame": "",
+            #                    "prior_pcd_file": "",
+            #                    "input_cloud_topic": "cloud_registered",
+            #             }
+            #         ],
+            # ),
             Node(
                 package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
                 remappings=[('cloud_in',  '/livox/lidar'),
                             ('scan', '/scan')],
                 parameters=[{
-                    'target_frame': 'base_link',
+                    'target_frame': 'baselink',
                     'transform_tolerance': 0.5,
                     'min_height': 0.1,
                     'max_height': 1.00,
@@ -136,31 +135,31 @@ def generate_launch_description():
             #         "odom",
             #     ],
             # ),
-            Node(
-                package="fake_vel_transform",
-                executable="fake_vel_transform_node",
-                output="screen",
-                parameters=[{"use_sim_time": use_sim_time}],
-            ),
+            # Node(
+            #     package="fake_vel_transform",
+            #     executable="fake_vel_transform_node",
+            #     output="screen",
+            #     parameters=[{"use_sim_time": use_sim_time}],
+            # ),
             Node(
                 package="cod_serial_ul26",
                 executable="cod_serial",
                 output="screen",
                 parameters=[{"use_sim_time": use_sim_time}],
             ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(get_package_share_directory('realsense2_camera'),'launch','rs_launch.py')
-                ),
-                launch_arguments={
-                    'depth_module.depth_profile': '1280x720x30',
-                    'pointcloud.enable': 'true'
-                }.items()
-            ),
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource(
+            #         os.path.join(get_package_share_directory('realsense2_camera'),'launch','rs_launch.py')
+            #     ),
+            #     launch_arguments={
+            #         'depth_module.depth_profile': '1280x720x30',
+            #         'pointcloud.enable': 'true'
+            #     }.items()
+            # ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(os.path.join(bring_up_dir,'launch','navigation_launch.py')),
                 launch_arguments={
-                                  'use_sim_time': "false",
+                                  'use_sim_time': "true",
                                   'autostart': "true",
                                   'params_file': nav2_params_file,
                                   'use_composition': 'False',
