@@ -14,9 +14,12 @@ slam_toolbox:
     odom_frame: odom
     map_frame: map
     base_frame: baselink
+    # 仿真建图用 /scan：由 pointcloud_to_laserscan 从 3D 雷达投影得到，
+    # 能扫到低于 0.28 m 的场地障碍，且其 range_min=0.5 已把自车点滤掉。
+    # 原来的 /rplidar_a2/scan 装在 0.28 m，看不到低障碍，还会扫到车体。
     scan_topic: /scan
     use_map_saver: true
-    mode: lifelong #localization
+    mode: mapping #localization
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
@@ -27,13 +30,18 @@ slam_toolbox:
 
     debug_logging: false
     throttle_scans: 1 #信任里程计
-    transform_publish_period: 0.0 #if 0 never publishes odometry
-    map_update_interval: 1.0
+    transform_publish_period: 0.02 #if 0 never publishes odometry
+    map_update_interval: 0.5
     resolution: 0.05
-    min_laser_range: 0.2 #for rastering images
-    max_laser_range: 10.0 #for rastering images
-    minimum_time_interval: 0.3
-    transform_timeout: 0.2
+    min_laser_range: 0.5 #for rastering images; 与 /scan 的 range_min 一致，滤掉自车回波
+    max_laser_range: 20.0 #for rastering images
+    minimum_time_interval: 0.1
+    transform_timeout: 0.5
+    # 默认 false 时 map->odom 用“最后一次被处理的扫描时间戳”打时间戳；
+    # 车静止时扫描被 minimum_travel_distance 门限挡住、不再处理，
+    # map->odom 时间戳就被冻结，Nav2 controller 报 "Transform data too old" 并 abort 目标，
+    # 车永远动不了（死锁）。改为 true：每次都用当前时间发布，TF 始终新鲜。
+    restamp_tf: true
     tf_buffer_duration: 30.
     stack_size_to_use: 40000000 #// program needs a larger stack size to serialize large maps
     enable_interactive_mode: true
@@ -41,10 +49,10 @@ slam_toolbox:
     # General Parameters
     use_scan_matching: true
     use_scan_barycenter: true
-    minimum_travel_distance: 1.0
+    minimum_travel_distance: 0.3
     minimum_travel_heading: 0.1
-    scan_buffer_size: 10
-    scan_buffer_maximum_scan_distance: 10.0
+    scan_buffer_size: 20
+    scan_buffer_maximum_scan_distance: 20.0
     link_match_minimum_response_fine: 0.1
     link_scan_maximum_distance: 1.5
     loop_search_maximum_distance: 3.0
@@ -74,3 +82,4 @@ slam_toolbox:
     minimum_angle_penalty: 0.9
     minimum_distance_penalty: 0.5
     use_response_expansion: true
+  

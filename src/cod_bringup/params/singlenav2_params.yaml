@@ -42,26 +42,26 @@ controller_server:
       direct_approach_kp: 3.0  #直接驱动P控制增益
       time_steps: 80  #增加到80，预测时域4.8s，让MPPI能看到冲过目标的后果
       model_dt: 0.02  #稍微放大步长，配合time_steps延长预测时域
-      batch_size: 1500 #控制器的采样数。
+      batch_size: 1000 #控制器的采样数。
 
       vx_std: 0.3 #增大采样多样性，让MPPI能采到更多减速/停止轨迹
       vy_std: 0.3
       wz_std: 0.2
 
-      vx_max: 2.5
-      vy_max: 2.5
+      vx_max: 3.0
+      vy_max: 3.0
       wz_max: 1.5
 
-      vx_min: -2.5
-      vy_min: -2.5
+      vx_min: -3.0
+      vy_min: -3.0
       wz_min: -1.5
 
-      ax_max: 1.5 #加速度提高，高速时能快速响应
-      ay_max: 1.5
+      ax_max: 2.0 #加速度提高，高速时能快速响应
+      ay_max: 2.0
       az_max: 1.0
 
-      ax_min: -3.5 #关键：制动力必须对称，高速下刹得住
-      ay_min: -3.5
+      ax_min: -4.5 #关键：制动力必须对称，高速下刹得住
+      ay_min: -4.5
       az_min: -3.0
 
       iteration_count: 1
@@ -177,7 +177,7 @@ local_costmap:
           obstacle_range: 8.0
           raytrace_range: 9.0
 
-          min_obstacle_height: 0.15     #default 0, meters
+          min_obstacle_height: 0.03     #default 0, meters
           max_obstacle_height: 1.0     #defaule 3, meters
           expected_update_rate: 0.0    #default 0, if not updating at this rate at least, remove from buffer
           observation_persistence: 0.0 #default 0, use all measurements taken during now-value, 0=latest
@@ -198,9 +198,9 @@ local_costmap:
           clearing: true
           obstacle_range: 3.0          #meters, 424x240低分辨率有效探测距离
           raytrace_range: 3.5          #meters, 清除射线范围略大于obstacle_range
-          min_z: 0.15                  #meters, 过滤地面
+          min_z: 0.03                  #meters, 过滤地面
           max_z: 3.5                   #meters, 低分辨率超过3.5m精度差
-          min_obstacle_height: 0.18    #meters, 最低障碍物高度
+          min_obstacle_height: 0.03    #meters, 最低障碍物高度
           max_obstacle_height: 1.5     #meters, 哨兵高度以上不关心
           #expected_update_rate: 15.0    #相机掉线时及时告警
           clear_after_reading: true    #高频输入及时清除缓冲
@@ -267,7 +267,7 @@ global_costmap:
           obstacle_range: 8.0
           raytrace_range: 9.0
 
-          min_obstacle_height: 0.15     #default 0, meters
+          min_obstacle_height: 0.03     #default 0, meters
           max_obstacle_height: 1.0     #defaule 3, meters
           expected_update_rate: 0.0    #default 0, if not updating at this rate at least, remove from buffer
           observation_persistence: 0.0 #default 0, use all measurements taken during now-value, 0=latest
@@ -288,9 +288,9 @@ global_costmap:
           clearing: true
           obstacle_range: 3.0
           raytrace_range: 3.5
-          min_z: 0.15
+          min_z: 0.03
           max_z: 3.5
-          min_obstacle_height: 0.18
+          min_obstacle_height: 0.03
           max_obstacle_height: 1.5
           #expected_update_rate: 15.0    #相机掉线时及时告警
           clear_after_reading: true
@@ -308,7 +308,7 @@ map_server:
     use_sim_time: False
     # Overridden in launch by the "map" launch configuration or provided default value.
     # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
-    yaml_filename: "/home/daiyuxin/cod_-rm2026_-navigation/src/cod_bringup/maps/rmul2026.yaml"
+    yaml_filename: "/home/daiyuxin/cod_nav/src/cod_bringup/maps/rmul2026.yaml"
 
 map_saver:
   ros__parameters:
@@ -424,11 +424,11 @@ velocity_smoother:
     smoothing_frequency: 30.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [2.5, 2.5, 2.5] #与 MPPI 限速一致，不再截断高速输出
-    min_velocity: [-2.5, -2.5, -2.5]
+    max_velocity: [3.0, 3.0, 1.5] #与 MPPI 限速一致，不再截断高速输出
+    min_velocity: [-3.0, -3.0, -1.5]
     deadband_velocity: [0.05, 0.05, 0.05]
     velocity_timeout: 1.0
     max_accel: [2.5, 2.5, 1.5] #与 MPPI 加速度一致
-    max_decel: [-3.5, -3.5, -3.0] #与 MPPI 制动一致
-    odom_topic: "Odometry"
+    max_decel: [-4.5, -4.5, -3.5] #与 MPPI 制动一致
+    odom_topic: "/chassis_odometry_gt"
     odom_duration: 0.1

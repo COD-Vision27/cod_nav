@@ -38,7 +38,7 @@ def generate_launch_description():
             "--yaw",
             "0.0",
             "--frame-id",
-            "base_link",
+            "baselink",
             "--child-frame-id",
             "livox_frame",
         ],

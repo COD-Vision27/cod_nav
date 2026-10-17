@@ -42,21 +42,21 @@ controller_server:
       vy_std: 0.35
       wz_std: 0.2
 
-      vx_max: 2.5
-      vy_max: 2.5
-      wz_max: 1.5
+      vx_max: 4.0
+      vy_max: 4.0
+      wz_max: 2.5
 
-      vx_min: -2.5
-      vy_min: -2.5
-      wz_min: -1.5
+      vx_min: -4.0
+      vy_min: -4.0
+      wz_min: -2.5
 
-      ax_max: 1.5 #加速度提高，高速时能快速响应
-      ay_max: 1.5
-      az_max: 3.0
+      ax_max: 3.5 #加速度提高，高速时能快速响应
+      ay_max: 3.5
+      az_max: 4.0
 
-      ax_min: -3.5 #关键：制动力必须对称，高速下刹得住
-      ay_min: -3.5
-      az_min: -3.0
+      ax_min: -5.5 #关键：制动力必须对称，高速下刹得住
+      ay_min: -5.5
+      az_min: -4.0
 
       iteration_count: 1
       prune_distance: 1.7 #高速下提前剪枝已通过的路径点
@@ -134,10 +134,7 @@ local_costmap:
       resolution: 0.05
       robot_radius: 0.2
       footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"
-      plugins: ["static_layer","stvl_voxel_layer","inflation_layer"]
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
+      plugins: ["stvl_voxel_layer","inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 5.0 #关键修正！原0.3衰减太慢，整个膨胀区代价都极高，MPPI没有梯度可用。5.0让代价快速衰减，形成清晰的"远离障碍物"梯度
@@ -171,7 +168,7 @@ local_costmap:
           obstacle_range: 8.0
           raytrace_range: 9.0
 
-          min_obstacle_height: 0.1     #default 0, meters
+          min_obstacle_height: 0.03    #default 0, meters
           max_obstacle_height: 1.0     #defaule 3, meters
           expected_update_rate: 0.0    #default 0, if not updating at this rate at least, remove from buffer
           observation_persistence: 0.0 #default 0, use all measurements taken during now-value, 0=latest
@@ -192,9 +189,9 @@ local_costmap:
           clearing: true
           obstacle_range: 3.0          #meters, 424x240低分辨率有效探测距离
           raytrace_range: 3.5          #meters, 清除射线范围略大于obstacle_range
-          min_z: 0.1                  #meters, 过滤地面
+          min_z: 0.03                 #meters, 过滤地面
           max_z: 3.5                   #meters, 低分辨率超过3.5m精度差
-          min_obstacle_height: 0.1    #meters, 最低障碍物高度
+          min_obstacle_height: 0.03   #meters, 最低障碍物高度
           max_obstacle_height: 1.5     #meters, 哨兵高度以上不关心
           #expected_update_rate: 15.0    #相机掉线时及时告警
           clear_after_reading: true    #高频输入及时清除缓冲
@@ -223,11 +220,7 @@ global_costmap:
       footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"
       resolution: 0.04
       track_unknown_space: true
-      plugins: ["static_layer","stvl_voxel_layer","inflation_layer"]
-      static_layer:
-        plugin: "nav2_costmap_2d::StaticLayer"
-        map_subscribe_transient_local: True
-        enable: true
+      plugins: ["stvl_voxel_layer","inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 15.0 #与local_costmap一致
@@ -261,7 +254,7 @@ global_costmap:
           obstacle_range: 8.0
           raytrace_range: 9.0
 
-          min_obstacle_height: 0.1     #default 0, meters
+          min_obstacle_height: 0.03    #default 0, meters
           max_obstacle_height: 1.0     #defaule 3, meters
           expected_update_rate: 0.0    #default 0, if not updating at this rate at least, remove from buffer
           observation_persistence: 0.0 #default 0, use all measurements taken during now-value, 0=latest
@@ -282,9 +275,9 @@ global_costmap:
           clearing: true
           obstacle_range: 3.0
           raytrace_range: 3.5
-          min_z: 0.1
+          min_z: 0.03
           max_z: 3.5
-          min_obstacle_height: 0.1
+          min_obstacle_height: 0.01
           max_obstacle_height: 1.5
           #expected_update_rate: 15.0    #相机掉线时及时告警
           clear_after_reading: true
@@ -418,11 +411,11 @@ velocity_smoother:
     smoothing_frequency: 30.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [2.5, 2.5, 2.5] #与 MPPI 限速一致，不再截断高速输出
-    min_velocity: [-2.5, -2.5, -2.5]
+    max_velocity: [4.0, 4.0, 2.5] #与 MPPI 限速一致，不再截断高速输出
+    min_velocity: [-4.0, -4.0, -2.5]
     deadband_velocity: [0.05, 0.05, 0.05]
     velocity_timeout: 1.0
-    max_accel: [2.5, 2.5, 3.0] #与 MPPI 加速度一致
-    max_decel: [-3.5, -3.5, -3.0] #与 MPPI 制动一致
+    max_accel: [4.0, 4.0, 4.5] #与 MPPI 加速度一致
+    max_decel: [-5.5, -5.5, -4.5] #与 MPPI 制动一致
     odom_topic: "/chassis_odometry_gt"
     odom_duration: 0.1

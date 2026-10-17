@@ -41,9 +41,11 @@ def generate_launch_description():
                 parameters=[{
                     'input_topic': '/livox/lidar',
                     'output_topic': '/livox/lidar_filtered',
-                    'min_x': -0.2, 'max_x': 0.2,
-                    'min_y': -0.2, 'max_y': 0.4,
-                    'min_z': -0.1, 'max_z': 0.2,
+                    # 仿真 mid360 按 rpy=(45°,0,0) 安装，车体在雷达系里被旋转了 45°；
+                    # 原盒子盖不住车体，会漏出本体点。
+                    'min_x': -0.34, 'max_x': 0.34,
+                    'min_y': -0.38, 'max_y': 0.33,
+                    'min_z': -0.40, 'max_z': 0.33,
                     'negative': True,   # 挖掉车身
                     'leaf_size': 0.05   # 降采样
                 }]
@@ -70,6 +72,7 @@ def generate_launch_description():
             #         output="screen",
             #         parameters=[
             #             {
+            #                    "use_sim_time": True,
             #                    "num_threads": 4,
             #                    "num_neighbors": 10,
             #                    "global_leaf_size": 0.25,
@@ -77,10 +80,10 @@ def generate_launch_description():
             #                    "max_dist_sq": 1.0,
             #                    "map_frame": "map",
             #                    "odom_frame": "odom",
-            #                    "base_frame": "",
-            #                    "lidar_frame": "",
-            #                    "prior_pcd_file": "",
-            #                    "input_cloud_topic": "cloud_registered",
+            #                    "base_frame": "baselink",
+            #                    "lidar_frame": "mid360",
+            #                    "prior_pcd_file": "/home/daiyuxin/cod_nav/src/cod_bringup/maps/rmul2026_walls.pcd",
+            #                    "input_cloud_topic": "/livox/lidar_raw",
             #             }
             #         ],
             # ),
@@ -91,9 +94,9 @@ def generate_launch_description():
                 name="map_to_odom",
                 arguments=[
                     "--x",
-                    "0.0",
+                    "1.276",
                     "--y",
-                    "0.0",
+                    "6.572",
                     "--z",
                     "0.05",
                     "--roll",
@@ -101,7 +104,7 @@ def generate_launch_description():
                     "--pitch",
                     "0.0",
                     "--yaw",
-                    "-0.5",
+                    "0.0",
                     "--frame-id",
                     "map",
                     "--child-frame-id",
@@ -141,7 +144,7 @@ def generate_launch_description():
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(os.path.join(bring_up_dir,'launch','navigation_launch.py')),
                 launch_arguments={
-                                  'use_sim_time': "false",
+                                  'use_sim_time': "true",
                                   'autostart': "true",
                                   'params_file': nav2_params_file,
                                   'use_composition': 'False',
@@ -151,7 +154,8 @@ def generate_launch_description():
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(os.path.join(bring_up_dir,'launch','localization_launch.py')),
                 launch_arguments={
-                                  'use_sim_time': "false",
+                                  'map': os.path.join(bring_up_dir,'maps','rmul2026_sim.yaml'),
+                                  'use_sim_time': "true",
                                   'autostart': "true",
                                   'params_file': nav2_params_file,
                                   'use_composition': 'False',

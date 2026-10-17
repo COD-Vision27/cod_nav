@@ -10,9 +10,9 @@ def generate_launch_description():
         return [
             'bash', '-c',
             'source /opt/ros/jazzy/setup.bash && '
-            'source /home/daiyuxin/cod_-rm2026_-navigation/install/setup.bash && '
-            'mkdir -p /home/daiyuxin/cod_-rm2026_-navigation/src/cod_bringup/maps/auto_save && '
-            f'ros2 run nav2_map_server map_saver_cli -f /home/daiyuxin/cod_-rm2026_-navigation/src/cod_bringup/maps/auto_save/auto_map_{suffix}'
+            'source /home/daiyuxin/cod_nav/install/setup.bash && '
+            'mkdir -p /home/daiyuxin/cod_nav/src/cod_bringup/maps/auto_save && '
+            f'ros2 run nav2_map_server map_saver_cli -f /home/daiyuxin/cod_nav/src/cod_bringup/maps/auto_save/auto_map_{suffix}'
         ]
 
     intervals = [ 30, 60, 90, 120, 150, 180, 210, 240, 270, 300]    #保存时间间隔

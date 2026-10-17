@@ -26,6 +26,10 @@ install(
   DIRECTORY launch params rviz maps wps behavior_trees
   DESTINATION share/${PROJECT_NAME}
 )
+install(
+  PROGRAMS scripts/pgm_to_pcd.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 
 ament_package()

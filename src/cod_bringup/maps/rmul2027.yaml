@@ -1,0 +1,10 @@
+image: rmul2027.pgm
+mode: trinary
+resolution: 0.01
+origin:
+- -1.251
+- -6.561
+- 0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
