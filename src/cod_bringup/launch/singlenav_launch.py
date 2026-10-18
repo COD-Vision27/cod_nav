@@ -92,11 +92,17 @@ def generate_launch_description():
                 package="tf2_ros",
                 executable="static_transform_publisher",
                 name="map_to_odom",
+                # rmul2027 地图是在「odom 原点 = 出生点」的坐标系里画的
+                # （odom_to_tf.py 的 zero_on_start=True 会把出生点平移到原点），
+                # 所以 map->odom 基本是单位变换；(0.30, 0) 只是地图 yaml 的水平
+                # origin 与场地内壁之间约 0.3 m 的裁剪误差补偿。
+                # 旧的 (1.276, 6.572) 是配 rmul2026_sim 地图的值，换图后必须改，
+                # 否则机器人会被放到地图上方 ~5 m 处。
                 arguments=[
                     "--x",
-                    "1.276",
+                    "0.30",
                     "--y",
-                    "6.572",
+                    "0.0",
                     "--z",
                     "0.05",
                     "--roll",
@@ -154,7 +160,7 @@ def generate_launch_description():
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(os.path.join(bring_up_dir,'launch','localization_launch.py')),
                 launch_arguments={
-                                  'map': os.path.join(bring_up_dir,'maps','rmul2026_sim.yaml'),
+                                  'map': os.path.join(bring_up_dir,'maps','rmul2027.yaml'),
                                   'use_sim_time': "true",
                                   'autostart': "true",
                                   'params_file': nav2_params_file,
